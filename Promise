@@ -6,6 +6,8 @@ let p =new Promise(function(resolve, reject){
     }
 })
 
+
+
 p.then((res)=>{
   console.log(res)
 },(err)=>{
