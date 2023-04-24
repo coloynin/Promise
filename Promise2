@@ -1,0 +1,53 @@
+const PENDING = "pending"; //等待
+const FULFILLED = "fulfilled"; //已完成
+const REJECTED = "rejected"; // 已拒绝
+
+function Promise(executor) {
+    let self = this;
+    self.status = PENDING;
+
+    self.value;
+    self.reason;
+
+
+    function resolve(value) {
+        if (self.status === PENDING) {
+            self.status = FULFILLED;
+            self.value = value;
+        }
+    }
+
+    function reject(reason) {
+        if (self.status === PENDING) {
+            self.status = REJECTED;
+            self.reason = reason;
+        }
+    }
+    try { // 规范提到，执行器抛异常会reject
+        executor(resolve, reject);
+    } catch(e) {
+        reject(e)
+    }
+}
+// then方法实现
+Promise.prototype.then = function (onFulfilled, onRjected) {
+    let self = this;
+    /**
+     * onFulfilled 和 onRejected 都是可选参数。
+     * 如果 onFulfilled 不是函数，其必须被忽略
+     * 如果 onRejected 不是函数，其必须被忽略
+     */
+    onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : function(value) {
+        return value;
+    };
+    onRjected = typeof onRjected === 'function' ? onRjected : function(reason) {
+        throw reason;
+    }
+    
+    if (self.status === FULFILLED) {
+        onFulfilled(self.value);
+    }
+    if (self.status === REJECTED) {
+        onRjected(self.reason);
+    }
+}
